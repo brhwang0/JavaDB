@@ -19,7 +19,6 @@ public class JavaDB {
 		try {
 			Class.forName("com.mysql.jdbc.Driver");
 			Connection con = DriverManager.getConnection(connection, username, password);
-			//Connection con = DriverManager.getConnection("jdbc:mysql://192.168.0.37:3306/pokemon","HH","123");   
 			Statement stmt = con.createStatement();  
 			ResultSet rs = stmt.executeQuery("select * from pokedex");
 			while (rs.next()) {
