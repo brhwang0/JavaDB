@@ -1,20 +1,44 @@
 import java.util.*;
 import java.sql.*;
+import javax.swing.*;
 
 public class JavaDB {
 	
-	public static void main(String[] args) {
+	static String connectionURL;
+	static String hostName;
+	static String username;
+	static String password;
+	
+	public static void setup() {
 		
+		String connectionURL;
+		
+		JTextField inputHost = new JTextField();
+		JTextField inputUser = new JTextField();
+		JTextField inputPass = new JPasswordField();
+		Object[] message = {
+			"Host IP: ", inputHost,
+			"Username:", inputUser,
+			"Password:", inputPass
+		};
+
+		int option = JOptionPane.showConfirmDialog(null, message, "Connection Setup", JOptionPane.OK_CANCEL_OPTION);
+		if (option == JOptionPane.OK_OPTION) {
+			hostName = "jdbc:mysql://" + inputHost.getText() + ":3306/";
+			username = inputUser.getText(); password = inputPass.getText();
+		}
+		else {
+			System.out.println("Connection setup cancelled.");
+			System.exit(1);
+		}
+	}
+	
+	public static void main(String[] args) {
+		setup();
 		Scanner s = new Scanner(System.in);
-		System.out.print("Please enter the host URL or IP address: ");
-		String host = s.nextLine();
-		System.out.print("Please enter username: ");
-		String username = s.nextLine();
-		System.out.print("Please enter password: ");
-		String password = s.nextLine();
-		String hostName = "jdbc:mysql://" + host + ":3306/";
 		
 		try {
+			
 			Connection con = DriverManager.getConnection(hostName, username, password); 
 			Statement stmt = con.createStatement();
 			ResultSet rs = stmt.executeQuery("show databases;");
