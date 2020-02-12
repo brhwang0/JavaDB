@@ -27,8 +27,6 @@ public class JavaDB {
 		
 		int option = JOptionPane.showConfirmDialog(null, message, "Connection Setup", JOptionPane.OK_CANCEL_OPTION);
 		
-		System.out.println(option);
-		
 		if (option == JOptionPane.OK_OPTION) {
 			hostName = "jdbc:mysql://" + inputHost.getText() + ":" + inputPort.getText() + "/";
 			username = inputUser.getText(); password = inputPass.getText();
