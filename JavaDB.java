@@ -14,6 +14,7 @@ public class JavaDB {
 		String connectionURL;
 		
 		JTextField inputHost = new JTextField();
+		inputHost.addAncestorListener(new RequestFocusListener());
 		JTextField inputPort = new JTextField();
 		JTextField inputUser = new JTextField();
 		JTextField inputPass = new JPasswordField();
@@ -23,8 +24,11 @@ public class JavaDB {
 			"Username:", inputUser,
 			"Password:", inputPass
 		};
-
+		
 		int option = JOptionPane.showConfirmDialog(null, message, "Connection Setup", JOptionPane.OK_CANCEL_OPTION);
+		
+		System.out.println(option);
+		
 		if (option == JOptionPane.OK_OPTION) {
 			hostName = "jdbc:mysql://" + inputHost.getText() + ":" + inputPort.getText() + "/";
 			username = inputUser.getText(); password = inputPass.getText();
@@ -44,7 +48,7 @@ public class JavaDB {
 			Connection con = DriverManager.getConnection(hostName, username, password); 
 			Statement stmt = con.createStatement();
 			
-			// Displaying and choosing databases
+			// Displaying and choosing database
 			ResultSet rs = stmt.executeQuery("show databases;");
 			while (rs.next()) {
 				System.out.println("Database: " + rs.getString("Database"));
@@ -53,7 +57,7 @@ public class JavaDB {
 			String dbname = s.nextLine();
 			stmt.executeQuery("use " + dbname);
 			
-			// Displaying and choosing tables
+			// Displaying and choosing table
 			rs = stmt.executeQuery("show tables;");
 			while (rs.next()) {
 				System.out.println("Tables: " + rs.getString("Tables_in_" + dbname));
@@ -62,10 +66,19 @@ public class JavaDB {
 			String tablename = s.nextLine();
 			rs = stmt.executeQuery("select * from " + tablename);
 			ResultSetMetaData rsmd = rs.getMetaData();
-			int columnsNumber = rsmd.getColumnCount();
+			int numColumns = rsmd.getColumnCount();
 			
 			// Print table
+			for (int i= 1; i < numColumns + 1; i++) {
+				System.out.print(rsmd.getColumnLabel(i) + " ");
+			}
+			System.out.println();
 			while (rs.next()) {
+				for (int i = 1; i < numColumns + 1; i++) {
+					System.out.print(rs.getString(i) + " ");
+				}
+				System.out.println();
+				
 			}
 			
 			con.close();
