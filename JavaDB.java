@@ -48,8 +48,9 @@ public class JavaDB {
 			while (true) {
 				// Displaying and choosing database
 				ResultSet rs = stmt.executeQuery("show databases;");
+				System.out.println("\n*** Database List ***\n");
 				while (rs.next()) {
-					System.out.println("Database: " + rs.getString("Database"));
+					System.out.println(rs.getString("Database"));
 				}
 				
 				System.out.print("\nPlease choose a database to use: ");
@@ -72,8 +73,9 @@ public class JavaDB {
 				
 				// Displaying and choosing table
 				rs = stmt.executeQuery("show tables;");
+				System.out.println("\n*** Tables in Database \"" + dbname + "\" ***\n");
 				while (rs.next()) {
-					System.out.println("Table: " + rs.getString("Tables_in_" + dbname));
+					System.out.println(rs.getString("Tables_in_" + dbname));
 				}
 				System.out.print("\nPlease choose the table you'd like to view: ");
 				while (true) {
