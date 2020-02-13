@@ -26,7 +26,6 @@ public class JavaDB {
 		};
 		
 		int option = JOptionPane.showConfirmDialog(null, message, "Connection Setup", JOptionPane.OK_CANCEL_OPTION);
-		
 		if (option == JOptionPane.OK_OPTION) {
 			hostName = "jdbc:mysql://" + inputHost.getText() + ":" + inputPort.getText() + "/";
 			username = inputUser.getText(); password = inputPass.getText();
@@ -38,35 +37,56 @@ public class JavaDB {
 	}
 	
 	public static void main(String[] args) {
-		setup();
+		//setup();
 		Scanner s = new Scanner(System.in);
 		
 		try {
 			
-			Connection con = DriverManager.getConnection(hostName, username, password); 
+			//Connection con = DriverManager.getConnection(hostName, username, password); 
+			Connection con = DriverManager.getConnection("jdbc:mysql://192.168.137.99:3306/", "HH", "1234");
 			Statement stmt = con.createStatement();
+			String dbname, tablename;
 			
 			// Displaying and choosing database
 			ResultSet rs = stmt.executeQuery("show databases;");
 			while (rs.next()) {
 				System.out.println("Database: " + rs.getString("Database"));
 			}
-			System.out.print("Please choose a database to use: ");
-			String dbname = s.nextLine();
-			stmt.executeQuery("use " + dbname);
+			while (true) {
+				try {
+					System.out.print("Please choose a database to use: ");
+					dbname = s.nextLine();
+					stmt.executeQuery("use " + dbname);
+					System.out.println();
+					break;
+				}
+				catch (Exception e) {
+					System.out.println("Please enter a valid database name.");
+				}
+			}
 			
 			// Displaying and choosing table
 			rs = stmt.executeQuery("show tables;");
 			while (rs.next()) {
 				System.out.println("Tables: " + rs.getString("Tables_in_" + dbname));
 			}
-			System.out.print("Please choose the table you'd like to view: ");
-			String tablename = s.nextLine();
-			rs = stmt.executeQuery("select * from " + tablename);
+			while (true) {
+				try {
+					System.out.print("Please choose the table you'd like to view: ");
+					tablename = s.nextLine();
+					rs = stmt.executeQuery("select * from " + tablename);
+					System.out.println();
+					break;
+				}
+				catch (Exception e) {
+					System.out.println("Please enter a valid table name.");
+				}
+			}
+			
+			// Printing table
 			ResultSetMetaData rsmd = rs.getMetaData();
 			int numColumns = rsmd.getColumnCount();
 			
-			// Print table
 			for (int i= 1; i < numColumns + 1; i++) {
 				System.out.print(rsmd.getColumnLabel(i) + " ");
 			}
