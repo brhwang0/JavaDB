@@ -36,76 +36,99 @@ public class JavaDB {
 	}
 	
 	public static void main(String[] args) {
-		setup();
+		//setup();
 		
 		Scanner s = new Scanner(System.in);
-		
 		try {
-			Connection con = DriverManager.getConnection(hostName, username, password);
-			//Connection con = DriverManager.getConnection("jdbc:mysql://192.168.137.99:3306/", "HH", "1234");
+			//Connection con = DriverManager.getConnection(hostName, username, password);
+			Connection con = DriverManager.getConnection("jdbc:mysql://10.255.170.136:3306/", "HH", "1234");
 			Statement stmt = con.createStatement();
 			String dbname, tablename;
 			
-			// Displaying and choosing database
-			ResultSet rs = stmt.executeQuery("show databases;");
-			while (rs.next()) {
-				System.out.println("Database: " + rs.getString("Database"));
-			}
 			while (true) {
-				try {
-					System.out.print("Please choose a database to use: ");
-					dbname = s.nextLine();
-					stmt.executeQuery("use " + dbname);
-					System.out.println();
-					break;
+				// Displaying and choosing database
+				ResultSet rs = stmt.executeQuery("show databases;");
+				while (rs.next()) {
+					System.out.println("Database: " + rs.getString("Database"));
 				}
-				catch (SQLException e) {
-					System.out.println("Please enter a valid database name.");
+				
+				System.out.print("\nPlease choose a database to use: ");
+				while (true) {
+					try {
+						
+						dbname = s.nextLine();
+						stmt.executeQuery("use " + dbname);
+						System.out.println();
+						break;
+					}
+					catch (SQLException e) {
+						System.out.print("\nPlease enter a valid database name: ");
+					}
+					catch (NoSuchElementException e) {
+						System.out.println("\n\nProgram terminated.");
+						System.exit(1);
+					}
 				}
-				catch (NoSuchElementException e) {
-					System.out.println("\n\nProgram terminated.");
-					System.exit(1);
+				
+				// Displaying and choosing table
+				rs = stmt.executeQuery("show tables;");
+				while (rs.next()) {
+					System.out.println("Table: " + rs.getString("Tables_in_" + dbname));
 				}
-			}
-			
-			// Displaying and choosing table
-			rs = stmt.executeQuery("show tables;");
-			while (rs.next()) {
-				System.out.println("Tables: " + rs.getString("Tables_in_" + dbname));
-			}
-			while (true) {
-				try {
-					System.out.print("Please choose the table you'd like to view: ");
-					tablename = s.nextLine();
-					rs = stmt.executeQuery("select * from " + tablename);
-					System.out.println();
-					break;
+				System.out.print("\nPlease choose the table you'd like to view: ");
+				while (true) {
+					try {
+						tablename = s.nextLine();
+						rs = stmt.executeQuery("select * from " + tablename);
+						System.out.println();
+						break;
+					}
+					catch (SQLException e) {
+						System.out.print("\nPlease enter a valid table name: ");
+					}
+					catch (NoSuchElementException e) {
+						System.out.println("\n\nProgram terminated.");
+						System.exit(1);
+					}
 				}
-				catch (SQLException e) {
-					System.out.println("Please enter a valid table name.");
-				}
-				catch (NoSuchElementException e) {
-					System.out.println("\n\nProgram terminated.");
-					System.exit(1);
-				}
-			}
-			
-			// Printing table
-			ResultSetMetaData rsmd = rs.getMetaData();
-			int numColumns = rsmd.getColumnCount();
-			
-			for (int i= 1; i < numColumns + 1; i++) {
-				System.out.print(rsmd.getColumnLabel(i) + " ");
-			}
-			System.out.println();
-			while (rs.next()) {
-				for (int i = 1; i < numColumns + 1; i++) {
-					System.out.print(rs.getString(i) + " ");
+				// Printing table
+				ResultSetMetaData rsmd = rs.getMetaData();
+				int numColumns = rsmd.getColumnCount();
+				
+				for (int i= 1; i < numColumns + 1; i++) {
+					System.out.print(rsmd.getColumnLabel(i) + " ");
 				}
 				System.out.println();
+				while (rs.next()) {
+					for (int i = 1; i < numColumns + 1; i++) {
+						System.out.print(rs.getString(i) + " ");
+					}
+					System.out.println();
+				}
+				
+				// Ask user if they want to view another table
+				System.out.println();
+				System.out.print("Would you like to view another table? Please enter Y/N: ");
+				while (true) {
+					
+					String option = s.nextLine();
+					char c = Character.toLowerCase(option.charAt(0));
+					
+					if (option.length() != 1) {
+						System.out.print("Invalid input. Please enter Y or N: ");
+					}
+					else if (c == 'n') {
+						con.close();
+						System.exit(0);
+					}
+					else if (c == 'y') {
+						break;
+					}
+					else {
+						System.out.println("Invalid input. Please enter Y or N: ");
+					}
+				}
 			}
-			
-			con.close();
 		}
 		
 		catch (SQLException e) {
