@@ -10,7 +10,6 @@ public class JavaDB {
 	static String password;
 	
 	public static void setup() {
-		
 		String connectionURL;
 		
 		JTextField inputHost = new JTextField();
@@ -32,18 +31,18 @@ public class JavaDB {
 		}
 		else {
 			System.out.println("Connection setup cancelled.");
-			System.exit(1);
+			System.exit(0);
 		}
 	}
 	
 	public static void main(String[] args) {
-		//setup();
+		setup();
+		
 		Scanner s = new Scanner(System.in);
 		
 		try {
-			
-			//Connection con = DriverManager.getConnection(hostName, username, password); 
-			Connection con = DriverManager.getConnection("jdbc:mysql://192.168.137.99:3306/", "HH", "1234");
+			Connection con = DriverManager.getConnection(hostName, username, password);
+			//Connection con = DriverManager.getConnection("jdbc:mysql://192.168.137.99:3306/", "HH", "1234");
 			Statement stmt = con.createStatement();
 			String dbname, tablename;
 			
@@ -60,8 +59,12 @@ public class JavaDB {
 					System.out.println();
 					break;
 				}
-				catch (Exception e) {
+				catch (SQLException e) {
 					System.out.println("Please enter a valid database name.");
+				}
+				catch (NoSuchElementException e) {
+					System.out.println("\n\nProgram terminated.");
+					System.exit(1);
 				}
 			}
 			
@@ -78,8 +81,12 @@ public class JavaDB {
 					System.out.println();
 					break;
 				}
-				catch (Exception e) {
+				catch (SQLException e) {
 					System.out.println("Please enter a valid table name.");
+				}
+				catch (NoSuchElementException e) {
+					System.out.println("\n\nProgram terminated.");
+					System.exit(1);
 				}
 			}
 			
@@ -96,11 +103,15 @@ public class JavaDB {
 					System.out.print(rs.getString(i) + " ");
 				}
 				System.out.println();
-				
 			}
 			
 			con.close();
 		}
+		
+		catch (SQLException e) {
+			System.out.println(e.getMessage());
+		}
+		
 		catch (Exception e) {
 			System.out.println(e);
 		}
