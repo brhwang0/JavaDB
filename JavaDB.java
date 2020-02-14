@@ -41,7 +41,7 @@ public class JavaDB {
 		Scanner s = new Scanner(System.in);
 		try {
 			//Connection con = DriverManager.getConnection(hostName, username, password);
-			Connection con = DriverManager.getConnection("jdbc:mysql://10.255.170.136:3306/", "HH", "1234");
+			Connection con = DriverManager.getConnection("jdbc:mysql://10.255.172.2:3306/", "HH", "1234");
 			Statement stmt = con.createStatement();
 			String dbname, tablename;
 			
@@ -112,22 +112,30 @@ public class JavaDB {
 				System.out.println();
 				System.out.print("Would you like to view another table? Please enter Y/N: ");
 				while (true) {
-					
-					String option = s.nextLine();
-					char c = Character.toLowerCase(option.charAt(0));
-					
-					if (option.length() != 1) {
+					try {
+						String option = s.nextLine();
+						char c = Character.toLowerCase(option.charAt(0));
+						
+						if (option.length() != 1) {
+							System.out.print("Invalid input. Please enter Y or N: ");
+						}
+						else if (c == 'n') {
+							con.close();
+							System.exit(0);
+						}
+						else if (c == 'y') {
+							break;
+						}
+						else {
+							System.out.println("Invalid input. Please enter Y or N: ");
+						}
+					}
+					catch (StringIndexOutOfBoundsException e) {
 						System.out.print("Invalid input. Please enter Y or N: ");
 					}
-					else if (c == 'n') {
-						con.close();
-						System.exit(0);
-					}
-					else if (c == 'y') {
-						break;
-					}
-					else {
-						System.out.println("Invalid input. Please enter Y or N: ");
+					catch (NoSuchElementException e) {
+						System.out.println("\n\nProgram terminated.");
+						System.exit(1);
 					}
 				}
 			}
