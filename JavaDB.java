@@ -5,29 +5,36 @@ import javax.swing.*;
 public class JavaDB {
 	
 	static String connectionURL;
-	static String hostName;
 	static String username;
 	static String password;
 	
 	public static void setup() {
-		String connectionURL;
 		
 		JTextField inputHost = new JTextField();
 		inputHost.addAncestorListener(new RequestFocusListener());
 		JTextField inputPort = new JTextField();
 		JTextField inputUser = new JTextField();
 		JTextField inputPass = new JPasswordField();
+		JCheckBox useSSL = new JCheckBox("Connect using SSL");
 		Object[] message = {
 			"Host IP: ", inputHost,
 			"Port: ", inputPort,
 			"Username:", inputUser,
-			"Password:", inputPass
+			"Password:", inputPass,
+			useSSL
 		};
 		
 		int option = JOptionPane.showConfirmDialog(null, message, "Connection Setup", JOptionPane.OK_CANCEL_OPTION);
 		if (option == JOptionPane.OK_OPTION) {
-			hostName = "jdbc:mysql://" + inputHost.getText() + ":" + inputPort.getText() + "/";
+			connectionURL = "jdbc:mysql://" + inputHost.getText() + ":" + inputPort.getText() + "/";
 			username = inputUser.getText(); password = inputPass.getText();
+			
+			if (useSSL.isSelected()) {
+				connectionURL += "?useSSL=true&verifyServerCertificate=false";
+			}
+			else {
+				connectionURL += "?useSSL=false&verifyServerCertificate=false";
+			}
 		}
 		else {
 			System.out.println("Connection setup cancelled.");
@@ -36,12 +43,13 @@ public class JavaDB {
 	}
 	
 	public static void main(String[] args) {
-		//setup();
+		setup();
 		
 		Scanner s = new Scanner(System.in);
 		try {
-			//Connection con = DriverManager.getConnection(hostName, username, password);
-			Connection con = DriverManager.getConnection("jdbc:mysql://10.255.172.2:3306/", "HH", "1234");
+			
+			Connection con = DriverManager.getConnection(connectionURL, username, password);
+			System.out.println(connectionURL);
 			Statement stmt = con.createStatement();
 			String dbname, tablename;
 			
