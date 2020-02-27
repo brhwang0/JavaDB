@@ -7,6 +7,7 @@ public class JavaDB {
 	static String connectionURL;
 	static String username;
 	static String password;
+	static Scanner s = new Scanner(System.in);
 	
 	public static void setup() {
 		
@@ -28,7 +29,6 @@ public class JavaDB {
 		if (option == JOptionPane.OK_OPTION) {
 			connectionURL = "jdbc:mysql://" + inputHost.getText() + ":" + inputPort.getText() + "/";
 			username = inputUser.getText(); password = inputPass.getText();
-			
 			if (useSSL.isSelected()) {
 				connectionURL += "?useSSL=true&verifyServerCertificate=false";
 			}
@@ -45,63 +45,90 @@ public class JavaDB {
 	public static void main(String[] args) {
 		setup();
 		
-		Scanner s = new Scanner(System.in);
 		try {
-			
+			// Establishing connection to server
 			Connection con = DriverManager.getConnection(connectionURL, username, password);
-			System.out.println(connectionURL);
 			Statement stmt = con.createStatement();
-			String dbname, tablename;
+			String dbname = "", tablename = "";
+			
+			// Creating list of available databases
+			ArrayList<String> dbList = new ArrayList<String>();
+			ResultSet rs = stmt.executeQuery("show databases;");
+			while (rs.next()) {
+				dbList.add(rs.getString("Database"));
+			}
+			
+			// Creating radio button for each database
+			JRadioButton dbArr[] = new JRadioButton[dbList.size()];
+			ButtonGroup dbGroup = new ButtonGroup();
+			for (int i = 0; i < dbArr.length; i++) {
+				dbArr[i] = new JRadioButton(dbList.get(i));
+				dbGroup.add(dbArr[i]);
+			}
+			
+			// Populate database options
+			Object[] databases = {
+				"Please choose a database to use: ", dbArr
+			};
 			
 			while (true) {
-				// Displaying and choosing database
-				ResultSet rs = stmt.executeQuery("show databases;");
-				System.out.println("\n*** Database List ***\n");
-				while (rs.next()) {
-					System.out.println(rs.getString("Database"));
-				}
+				// Display DB Selection dialog
+				int dbPane = JOptionPane.showConfirmDialog(null, databases, "Database List", JOptionPane.OK_CANCEL_OPTION);
 				
-				System.out.print("\nPlease choose a database to use: ");
-				while (true) {
-					try {
-						
-						dbname = s.nextLine();
-						stmt.executeQuery("use " + dbname);
-						System.out.println();
-						break;
+				// Check user selection
+				if (dbPane == JOptionPane.OK_OPTION) {
+					// Get selected database
+					for (int i = 0; i < dbArr.length; i++) {
+						if (dbArr[i].isSelected()) {
+							dbname = dbList.get(i);
+						}
 					}
-					catch (SQLException e) {
-						System.out.print("\nPlease enter a valid database name: ");
+					stmt.executeQuery("use " + dbname);
+					
+					// Creating list of available tables
+					rs = stmt.executeQuery("show tables;");
+					ArrayList<String> tableList = new ArrayList<String>();
+					while (rs.next()) {
+						tableList.add(rs.getString("Tables_in_" + dbname));
 					}
-					catch (NoSuchElementException e) {
-						System.out.println("\n\nProgram terminated.");
-						System.exit(1);
+					
+					// Creating radio button for each table
+					JRadioButton tableArr[] = new JRadioButton[tableList.size()];
+					ButtonGroup tableGroup = new ButtonGroup();
+					for (int i = 0; i < tableArr.length; i++) {
+						tableArr[i] = new JRadioButton(tableList.get(i));
+						tableGroup.add(tableArr[i]);
 					}
-				}
-				
-				// Displaying and choosing table
-				rs = stmt.executeQuery("show tables;");
-				System.out.println("\n*** Tables in Database \"" + dbname + "\" ***\n");
-				while (rs.next()) {
-					System.out.println(rs.getString("Tables_in_" + dbname));
-				}
-				System.out.print("\nPlease choose the table you'd like to view: ");
-				while (true) {
-					try {
-						tablename = s.nextLine();
+					
+					// Populate table options
+					Object[] tables = {
+						"Please choose a table to view: ", tableArr
+					};
+					// Display Table Selection dialog
+					int tablePane = JOptionPane.showConfirmDialog(null, tables, "Table List", JOptionPane.OK_CANCEL_OPTION);
+					
+					// Check user selection
+					if (tablePane == JOptionPane.OK_OPTION) {
+						// Get selected table and display table data
+						for (int i = 0; i < tableArr.length; i++) {
+							if (tableArr[i].isSelected()) {
+								tablename = tableList.get(i);
+							}
+						}
 						rs = stmt.executeQuery("select * from " + tablename);
-						System.out.println();
-						break;
 					}
-					catch (SQLException e) {
-						System.out.print("\nPlease enter a valid table name: ");
-					}
-					catch (NoSuchElementException e) {
-						System.out.println("\n\nProgram terminated.");
-						System.exit(1);
+					else {
+						System.out.println("Program terminated.");
+						System.exit(0);
 					}
 				}
-				// Printing table
+				
+				else {
+					System.out.println("Program terminated.");
+					System.exit(0);
+				}
+				
+				// Printing table to console
 				ResultSetMetaData rsmd = rs.getMetaData();
 				int numColumns = rsmd.getColumnCount();
 				
