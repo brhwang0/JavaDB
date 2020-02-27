@@ -70,6 +70,7 @@ public class JavaDB {
 			Object[] databases = {
 				"Please choose a database to use: ", dbArr
 			};
+			dbArr[0].setSelected(true);
 			
 			while (true) {
 				// Display DB Selection dialog
@@ -83,6 +84,7 @@ public class JavaDB {
 							dbname = dbList.get(i);
 						}
 					}
+					
 					stmt.executeQuery("use " + dbname);
 					
 					// Creating list of available tables
@@ -104,6 +106,8 @@ public class JavaDB {
 					Object[] tables = {
 						"Please choose a table to view: ", tableArr
 					};
+					tableArr[0].setSelected(true);
+					
 					// Display Table Selection dialog
 					int tablePane = JOptionPane.showConfirmDialog(null, tables, "Table List", JOptionPane.OK_CANCEL_OPTION);
 					
